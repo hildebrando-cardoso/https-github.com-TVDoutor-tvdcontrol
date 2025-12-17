@@ -63,6 +63,27 @@ const Inventory: React.FC = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Filter Helpers
+  const hasActiveFilters = searchQuery !== '' || activeFilters.category !== 'all' || activeFilters.status !== 'all';
+
+  const clearSearch = () => setSearchQuery('');
+  const clearCategory = () => setActiveFilters(prev => ({ ...prev, category: 'all' }));
+  const clearStatus = () => setActiveFilters(prev => ({ ...prev, status: 'all' }));
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setActiveFilters({ category: 'all', status: 'all' });
+  };
+
+  const getStatusLabel = (status: string) => {
+      switch(status) {
+          case 'available': return 'Disponível';
+          case 'in_use': return 'Em Uso';
+          case 'maintenance': return 'Manutenção';
+          case 'retired': return 'Desativado';
+          default: return status;
+      }
+  };
+
   // Handlers
   const handlePageChange = (pageNumber: number) => {
       setCurrentPage(pageNumber);
@@ -197,6 +218,50 @@ const Inventory: React.FC = () => {
                          </select>
                     </div>
                 </div>
+
+                {/* Active Filters Display */}
+                {hasActiveFilters && (
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-light dark:border-border-dark animate-in fade-in slide-in-from-top-1 duration-300">
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mr-1">
+                            Filtros Ativos:
+                        </span>
+                        
+                        {searchQuery && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700">
+                                Busca: "{searchQuery}"
+                                <button onClick={clearSearch} className="ml-1 p-0.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </span>
+                        )}
+
+                        {activeFilters.category !== 'all' && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs font-medium border border-blue-100 dark:border-blue-800">
+                                Categoria: {activeFilters.category}
+                                <button onClick={clearCategory} className="ml-1 p-0.5 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-400 hover:text-blue-600 dark:hover:text-blue-200 transition-colors">
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </span>
+                        )}
+
+                        {activeFilters.status !== 'all' && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-xs font-medium border border-purple-100 dark:border-purple-800">
+                                Status: {getStatusLabel(activeFilters.status)}
+                                <button onClick={clearStatus} className="ml-1 p-0.5 rounded-full hover:bg-purple-100 dark:hover:bg-purple-800 text-purple-400 hover:text-purple-600 dark:hover:text-purple-200 transition-colors">
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                </button>
+                            </span>
+                        )}
+
+                        <button 
+                            onClick={clearAllFilters}
+                            className="ml-auto text-xs font-medium text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:underline transition-colors flex items-center gap-1"
+                        >
+                            <span className="material-symbols-outlined text-[14px]">delete</span>
+                            Limpar Todos
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Inventory Table */}
